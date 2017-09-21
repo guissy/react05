@@ -1,0 +1,18 @@
+.app {
+  text-align: center;
+}
+
+.app-header {
+  padding: 8px;
+}
+
+main {
+  text-align: center;
+  min-width: 240px;
+  min-height: 100px;
+  max-width: 350px;
+}
+main .ant-table-tbody>tr>td,
+main .ant-table-thead>tr>th {
+  text-align: center;
+}
