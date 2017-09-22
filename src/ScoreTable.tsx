@@ -4,7 +4,7 @@ import { ColumnProps } from 'antd/lib/table/Column';
 // import './ScoreTable.css';
 
 export default class ScoreTable extends React.PureComponent<ScoreTableProps, {}> {
-  columns: ColumnProps<TableItem>[];
+  columns: ColumnProps<SkillItem>[];
 
   constructor(props: ScoreTableProps) {
     super(props);
@@ -32,7 +32,7 @@ export default class ScoreTable extends React.PureComponent<ScoreTableProps, {}>
             <Table
               size="small"
               columns={this.columns}
-              dataSource={[] as TableItem[]}
+              dataSource={data.skills as SkillItem[]}
               pagination={false}
               rowKey={(v, i) => i.toString()}
               bordered={true}
@@ -51,9 +51,10 @@ export interface ScoreTableProps {
   article: string;
   scores: number; // 总分
   lines: number[]; // 分级从高到低为A,B,C
+  skills: SkillItem[];
 }
 
-interface TableItem {
+export interface SkillItem {
   kw: string;
   age: string;
   score: string;

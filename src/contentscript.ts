@@ -1,18 +1,22 @@
 import ext from './utils/ext';
+import { SkillItem } from './ScoreTable';
 
-const extractTags = () => {
+type T = () => TableData;
+
+function extractTags(): TableData {
   const url = document.location.href;
   if (!url || !url.match(/^http/)) {
-    return {};
+    return {} as TableData;
   }
 
-  const data = {
+  const data: TableData = {
     title: '',
     description: '',
     url: document.location.href,
     scores: 0,
-    words: '',
-    article: ''
+    skills: [] as SkillItem[],
+    article: '',
+    error: null,
   };
 
   const keywords = {
@@ -152,13 +156,13 @@ const extractTags = () => {
   parse51job(data, keywords);
   parseLagou(data, keywords);
 
-  const descriptionTag = document.querySelector('meta[property*=description\']');
+  const descriptionTag = document.querySelector('meta[property*=description]');
   if (descriptionTag) {
     data.description = descriptionTag.getAttribute('content');
   }
 
   return data;
-};
+}
 
 function parse51job(data: TableData, keywords: {[k in string]: number}) {
   if (!document.URL.includes('51job.com')) {
@@ -199,11 +203,18 @@ function parse51job(data: TableData, keywords: {[k in string]: number}) {
               if (arr && arr.length > 0) {
                 if (mm > 0) {
                   let _mm = mm;
-                  if (v <= 0.5) _mm = Math.min(mm, 6);
-                  else if (v <= 1) _mm = Math.min(mm, 10);
-                  else if (v <= 2) _mm = Math.min(mm, 12);
-                  else if (v <= 3) _mm = Math.min(mm, 15);
-                  if (k.includes('vue')) _mm = Math.min(mm, 12);
+                  if (v <= 0.5) {
+                    _mm = Math.min(mm, 6);
+                  } else if (v <= 1) {
+                    _mm = Math.min(mm, 10);
+                  } else if (v <= 2) {
+                    _mm = Math.min(mm, 12);
+                  } else if (v <= 3) {
+                    _mm = Math.min(mm, 15);
+                  } // tslint:disable-line
+                  if (k.includes('vue')) {
+                    _mm = Math.min(mm, 12);
+                  } // tslint:disable-line
                   scores[k] = Math.max(scores[k], v * _mm / 6);
                   mouths[k] = Math.max(mouths[k], mm);
                   // words.push(k+' '+mm+'月'+'\n');
@@ -225,19 +236,24 @@ function parse51job(data: TableData, keywords: {[k in string]: number}) {
       }
     });
     data.scores = Object.keys(keywords).reduce((o, k) => o += scores[k], 0);
-    data.words = Object.keys(keywords).filter(k => mouths[k] > 0).map(
-      (k) => [k.replace(/\(|\)/, '').split('|').shift(), mouths[k] + '月', scores[k].toFixed(1)]
-    );
+    data.skills = Object.keys(keywords).filter(k => mouths[k] > 0).map((k) => ({
+        kw: k.replace(/\(|\)/, '').split('|').shift(),
+        age: mouths[k] + '月',
+        score: scores[k].toFixed(1),
+      }));
     if (scores === 0) {
-      data.words = ['很遗憾，没匹配到关键字！'];
+      data.skills = [];
+      data.error = '很遗憾，没匹配到关键字！';
     }
     data.article = article;
   } else {
     data.scores = -1;
-    data.words = '此网站已更新，插件过时';
+    data.skills = [];
+    data.error = '此网站已更新，插件过时';
   }
   return data;
 }
+
 function parseLagou(data: TableData, keywords: {[k in string]: number}) {
   if (!document.URL.includes('lagou')) {
     return {};
@@ -283,11 +299,18 @@ function parseLagou(data: TableData, keywords: {[k in string]: number}) {
           if (arr && arr.length > 0) {
             if (mm > 0) {
               let _mm = mm;
-              if (v <= 0.5) _mm = Math.min(mm, 6);
-              else if (v <= 1) _mm = Math.min(mm, 10);
-              else if (v <= 2) _mm = Math.min(mm, 12);
-              else if (v <= 3) _mm = Math.min(mm, 15);
-              if (k.includes('vue')) _mm = Math.min(mm, 12);
+              if (v <= 0.5) {
+                _mm = Math.min(mm, 6);
+              } else if (v <= 1) {
+                _mm = Math.min(mm, 10);
+              } else if (v <= 2) {
+                _mm = Math.min(mm, 12);
+              } else if (v <= 3) {
+                _mm = Math.min(mm, 15);
+              }
+              if (k.includes('vue')) {
+                _mm = Math.min(mm, 12);
+              }
               scores[k] = Math.max(scores[k], v * _mm / 6);
               mouths[k] = Math.max(mouths[k], mm);
               // words.push(k+' '+mm+'月'+'\n');
@@ -308,11 +331,14 @@ function parseLagou(data: TableData, keywords: {[k in string]: number}) {
       }
     });
     data.scores = Object.keys(keywords).reduce((o, k) => o += scores[k], 0);
-    data.words = Object.keys(keywords).filter(k => mouths[k] > 0).map(
-      (k) => [k.replace(/\(|\)/, '').split('|').shift(), mouths[k] + '月', scores[k].toFixed(1)]
-    );
+    data.skills = Object.keys(keywords).filter(k => mouths[k] > 0).map((k) => ({
+      kw: k.replace(/\(|\)/, '').split('|').shift(),
+      age: mouths[k] + '月',
+      score: scores[k].toFixed(1),
+    }));
     if (scores === 0) {
-      data.words = ['很遗憾，没匹配到关键字！'];
+      data.skills = [];
+      data.error = '很遗憾 ，没匹配到关键字！';
     }
     data.article = article;
   } else if (pdf) {
@@ -356,13 +382,20 @@ function parseLagou(data: TableData, keywords: {[k in string]: number}) {
           const next = timeRange[j + 1] ? timeRange[j + 1][1] : str.length;
           if (o2.index > index0 && o2.index < next) {
             let _mm = mm;
-            const k = Object.keys(keywords).find(v => new RegExp('\\b' + v + '\\b', 'gi').test(_k));
+            const k = Object.keys(keywords).find(kw => new RegExp('\\b' + kw + '\\b', 'gi').test(_k));
             const v = keywords[k];
-            if (v <= 0.5) _mm = Math.min(mm, 6);
-            else if (v <= 1) _mm = Math.min(mm, 10);
-            else if (v <= 2) _mm = Math.min(mm, 12);
-            else if (v <= 3) _mm = Math.min(mm, 15);
-            if (k.includes('vue')) _mm = Math.min(mm, 12);
+            if (v <= 0.5) {
+              _mm = Math.min(mm, 6);
+            } else if (v <= 1) {
+              _mm = Math.min(mm, 10);
+            } else if (v <= 2) {
+              _mm = Math.min(mm, 12);
+            } else if (v <= 3) {
+              _mm = Math.min(mm, 15);
+            }
+            if (k.includes('vue')) {
+              _mm = Math.min(mm, 12);
+            }
             scores[k] = Math.max(scores[k], v * _mm / 6);
             mouths[k] = Math.max(mouths[k], mm);
             return true;
@@ -375,22 +408,27 @@ function parseLagou(data: TableData, keywords: {[k in string]: number}) {
     }
 
     data.scores = Object.keys(keywords).reduce((o, k) => o += scores[k], 0);
-    data.words = Object.keys(keywords).filter(k => mouths[k] > 0).map(
-      (k) => [k.replace(/\(|\)/, '').split('|').shift(), mouths[k] + '月', scores[k].toFixed(1)]
-    );
+    data.skills = Object.keys(keywords).filter(k => mouths[k] > 0).map((k) => ({
+      kw: k.replace(/\(|\)/, '').split('|').shift(),
+      age: mouths[k] + '月',
+      score: scores[k].toFixed(1),
+    }));
     if (scores === 0) {
-      data.words = ['很遗憾，没匹配到关键字！'];
+      data.skills = [];
+      data.error = '很遗憾 ，没匹配到关键字！';
     }
 
   } else {
     data.scores = -1;
-    data.words = '此网站已更新，插件过时';
+    data.skills = [];
+    data.error = '此网站已更新，插件过时';
   }
   return data;
 }
 
-function onRequest(request: any, sender: any, sendResponse: any) {
+function onRequest(request: { action: string }, sender: number, sendResponse: (p: TableData) => void) {
   if (request.action === 'process-page') {
+    // console.log('☞☞☞ 9527 contentscript 395', extractTags());
     sendResponse(extractTags());
   }
 }
@@ -402,6 +440,7 @@ interface TableData {
   description: string;
   url: string;
   scores: number;
-  words: any[] | string;
+  skills: SkillItem[];
+  error: string;
   article: string;
 }

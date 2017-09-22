@@ -1,19 +1,19 @@
 import * as React from 'react';
-import { Button } from 'antd';
-// import './App.css';
-import ScoreTable from './ScoreTable';
+import ScoreTable, { ScoreTableProps, SkillItem } from './ScoreTable';
 import ext from './utils/ext';
 
-class App extends React.Component<{}, {article: string}> {
+class App extends React.Component<{}, ScoreTableProps> {
   constructor() {
     super();
     this.state = {
       article: 'loading...',
+      skills: [] as SkillItem[],
+      scores: 0,
+      lines: [80],
     };
-    ext.tabs.query({active: true, currentWindow: true}, (tabs: any[]) => {
+    ext.tabs.query({active: true, currentWindow: true}, (tabs: {id: number}[]) => {
       const activeTab = tabs[0];
       chrome.tabs.sendMessage(activeTab.id, { action: 'process-page' }, (data) => {
-        var displayContainer = document.getElementById('display-container');
         if (data) {
           this.setState(data);
         } else {
@@ -28,7 +28,12 @@ class App extends React.Component<{}, {article: string}> {
         <h3 className="app-header">简历筛选神器</h3>
 
         <main>
-          <ScoreTable article={this.state.article} lines={[80]} scores={90} />
+          <ScoreTable
+            article={this.state.article}
+            skills={this.state.skills}
+            scores={this.state.scores}
+            lines={this.state.lines}
+          />
         </main>
 
         <footer>

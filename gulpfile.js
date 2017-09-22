@@ -6,6 +6,7 @@ const source = require('vinyl-source-stream');
 const buffer = require('vinyl-buffer');
 const gulpif = require("gulp-if");
 const tsify = require("tsify");
+const rename = require("gulp-rename");
 const preprocessify = require('preprocessify');
 const $ = require('gulp-load-plugins')();
 process.env.BABEL_ENV = 'production';
@@ -18,7 +19,7 @@ const manifest = {
   dev: {
     "background": {
       "scripts": [
-        "scripts/livereload.js",
+        // "scripts/livereload.js",
         // "scripts/background.js"
       ]
     }
@@ -149,6 +150,7 @@ function buildJS(target) {
             "ascii_only": true
           }
         })))
+        .pipe(rename({extname: ".js"}))
         .pipe(gulp.dest(`build/${target}/scripts`))
         ;
     });
