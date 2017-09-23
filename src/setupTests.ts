@@ -1,9 +1,3 @@
-window.matchMedia =
-  window.matchMedia ||
-  (() => {
-    return { matches: false, addListener: () => {}, removeListener: () => {} };
-  });
-
 // storage
 // const localStorage = require('localStorage')
 // window.localStorage = window.sessionStorage = localStorage;
