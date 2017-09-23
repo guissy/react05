@@ -19,7 +19,7 @@ const manifest = {
   dev: {
     "background": {
       "scripts": [
-        // "scripts/livereload.js",
+        "scripts/livereload.js",
         // "scripts/background.js"
       ]
     }
@@ -128,7 +128,7 @@ function mergeAll(dest) {
 }
 
 function buildJS(target) {
-  let tasks = ['index.tsx', 'contentscript.ts'].map( file => {
+  let tasks = ['index.tsx', 'contentscript.ts', 'livereload.ts'].map( file => {
       return browserify({ debug: true })
         .add(file, { basedir: 'src' })
         .plugin(tsify, { skipLibCheck: true, moduleResolution:'node', jsx: 'react',
