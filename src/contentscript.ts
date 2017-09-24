@@ -3,7 +3,7 @@ import { SkillItem } from './ScoreTable';
 
 type T = () => TableData;
 
-function extractTags(): TableData {
+export function extractTags(): TableData {
   const url = document.location.href;
   if (!url || !url.match(/^http/)) {
     return {} as TableData;
@@ -175,7 +175,8 @@ function parse51job(data: TableData, keywords: {[k in string]: number}) {
     let article = '';
     let counter = 0;
     tds.forEach((td: HTMLTableDataCellElement) => {
-      if (td.innerText.trim() === '工作经验' || td.innerText.trim() === '项目经验') {
+      const tdTxt = td.innerText ? td.innerText.trim() : '';
+      if (tdTxt === '工作经验' || tdTxt === '项目经验') {
         let foundCounter = false;
         const table = td.closest('table').querySelector('table');
         if (table) {

@@ -1,4 +1,3 @@
-/// <reference types="chrome" />
 const apis = [
   'alarms',
   'bookmarks',
@@ -22,14 +21,13 @@ const apis = [
   'webRequest',
   'windows',
 ];
-// declare const chrome: any; // tslint:disable-line
-// declare const browser: any; // tslint:disable-line
-
+declare const window: any; // tslint:disable-line
+const chrome = window.chrome;
 class Extension { // tslint:disable-line
-  browserAction: any;
-  runtime: any;
-  storage: any;
-  tabs: any;
+  browserAction: any; // tslint:disable-line
+  runtime: any; // tslint:disable-line
+  storage: any; // tslint:disable-line
+  tabs: any; // tslint:disable-line
 
   constructor() {
     apis.forEach( (api: string) => {

@@ -2,20 +2,19 @@
   "name": "react05",
   "version": "0.1.0",
   "private": true,
+  "scripts": {
+    "start": "react-scripts-ts start",
+    "build": "react-scripts-ts build",
+    "test": "react-scripts-ts test --env=jsdom",
+    "eject": "react-scripts-ts eject"
+  },
   "dependencies": {
-    "@types/chrome": "^0.0.48",
     "antd": "^2.13.2",
     "react": "^15.6.1",
     "react-dom": "^15.6.1",
     "react-scripts-ts": "2.7.0",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0"
-  },
-  "scripts": {
-    "start": "react-scripts-ts start",
-    "build": "react-scripts-ts build",
-    "test": "react-scripts-ts test --env=jsdom",
-    "eject": "react-scripts-ts eject"
   },
   "devDependencies": {
     "@types/enzyme": "^2.8.8",
@@ -49,6 +48,7 @@
     "preprocessify": "^1.0.1",
     "react-app-rewire-less": "^2.0.7",
     "react-app-rewired": "^1.2.9",
+    "sinon-chrome": "^2.2.1",
     "tsify": "^3.0.3"
   }
 }
