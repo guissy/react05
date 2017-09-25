@@ -435,7 +435,7 @@ function onRequest(request: { action: string }, sender: number, sendResponse: (p
 
 ext.runtime.onMessage.addListener(onRequest);
 
-interface TableData {
+export interface TableData {
   title: string;
   // description: string;
   url: string;

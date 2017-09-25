@@ -1,7 +1,7 @@
 import any = jasmine.any;
 
 const fs = require('fs');
-import { extractTags } from './contentscript';
+import { extractTags, TableData } from './contentscript';
 
 test('test fetch html', () => {
   const html = fs.readFileSync('./src/jest/my.htm');
@@ -14,11 +14,18 @@ test('test fetch html', () => {
   expect(document.URL).toContain('51job');
   expect(document.body.innerHTML).toContain('51job');
   const data = extractTags();
-  const re = /[^\n]{100,}/g;
-  expect(data.article).toMatch(re);
+  expect(data).toHaveProperty('article');
+  expect(data).toHaveProperty('title');
+  expect(data).toHaveProperty('url');
+  expect(data).toHaveProperty('scores');
+  expect(data).toHaveProperty('skills');
+  expect(data).toHaveProperty('error');
   expect(data.article.length).toBeGreaterThan(100);
+  expect(data.title.length).toBeGreaterThan(1);
+  expect(data.url.length).toBeGreaterThan(1);
   expect(data.scores).toBeGreaterThan(8);
   expect(data.scores).toBeLessThan(18);
+  expect(data.skills.length).toBeGreaterThan(0);
 });
 test('test empty', () => {
   document.body.innerHTML = '<h1></h1>';
@@ -31,6 +38,12 @@ test('test empty', () => {
   }
   expect(document.URL).toContain('51job');
   const data = extractTags();
+  expect(data).toHaveProperty('article');
+  expect(data).toHaveProperty('title');
+  expect(data).toHaveProperty('url');
+  expect(data).toHaveProperty('scores');
+  expect(data).toHaveProperty('skills');
+  expect(data).toHaveProperty('error');
   expect(data.scores).toBe(0);
   // expect(data.error).toContain('！');
 });
