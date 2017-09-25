@@ -11,7 +11,6 @@ export function extractTags(): TableData {
 
   const data: TableData = {
     title: '',
-    description: '',
     url: document.location.href,
     scores: 0,
     skills: [] as SkillItem[],
@@ -158,7 +157,7 @@ export function extractTags(): TableData {
 
   const descriptionTag = document.querySelector('meta[property*=description]');
   if (descriptionTag) {
-    data.description = descriptionTag.getAttribute('content');
+    data.article = descriptionTag.getAttribute('content');
   }
 
   return data;
@@ -438,7 +437,7 @@ ext.runtime.onMessage.addListener(onRequest);
 
 interface TableData {
   title: string;
-  description: string;
+  // description: string;
   url: string;
   scores: number;
   skills: SkillItem[];

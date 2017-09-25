@@ -157,3 +157,9 @@ function buildJS(target) {
 
   return merge.apply(null, tasks);
 }
+
+gulp.task('parse51job', function () {
+  return gulp.src('src/jest/*.{htm,html}')
+    .pipe(gulp.replace())
+    .pipe(gulp.dest('src/jest/'))
+})
