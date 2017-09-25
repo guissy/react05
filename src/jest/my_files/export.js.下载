@@ -1,0 +1,44 @@
+function cv_export( isEnglish,DOMAIN_I,resumeID )
+{ 
+	if(isEnglish == 'c')
+	{
+		var html = '<div class="panel_lnp panel_py"><input type="hidden" id="isEnglish" value="c"><input type="hidden" id="resumeid" value="'+resumeID+'"><input type="hidden" id="domain" name="act" value="'+DOMAIN_I+'"><h2><p>导出简历</p><a class="layer_close" href="#"><i></i></a></h2><div class="pannel_con"><div class="gp5 clearfix"><span class="c_999">请选择导出格式</span><br><span class="rdbox c_666" onclick="exportSelect(\'word\')"><em class="rdo on" name="radio" id="word" data-value="word"></em>Word文档</span><span class="rdbox c_666" onclick="exportSelect(\'html\')"><em class="rdo" name="radio" data-value="html"></em>Html文件</span><div class="clear"></div></div></div><div class="but_box b2"><a href="" id="action"  class=""><span class="p_but" id="this_export" >确定</span></a></div></div>';	
+	}
+	else
+	{
+		var html='<div class="panel_lnp panel_py"><input type="hidden" id="isEnglish" value="e"><input type="hidden" id="resumeid" value="'+resumeID+'"><input type="hidden" id="domain" name="act" value="'+DOMAIN_I+'"><h2><p>Reminder</p><a class="layer_close" href="#"><i></i></a></h2><div class="pannel_con"><div class="gp5 clearfix"><span class="c_999">Please select export format：</span><br><span class="rdbox c_666" onclick="exportSelect(\'word\')"><em class="rdo on" name="radio" id="word" data-value="word"></em>word</span><span class="rdbox c_666" onclick="exportSelect(\'html\')"><em class="rdo" name="radio" data-value="html"></em>Html</span><div class="clear"></div></div></div><div class="but_box b2"><a href=""  class="" id="action"><span class="p_but" id="this_export" >OK</span></a></div></div>';
+	}
+	
+	oLayerSettings = jQuery.FLayer.init();
+	jQuery.FLayer.setContent(oLayerSettings,html);
+	jQuery.FLayer.open(oLayerSettings);
+	
+	action_url = DOMAIN_I+"/resume_preview.php?lang="+isEnglish+"&act=export&resumeid="+resumeID+"&type=word";	
+	$("#action").attr("href", action_url);
+	
+	$("#action").click(function(){
+        $("#layer_id").hide();
+        $("#layer_back_drop").hide();	
+	});
+}
+
+function exportSelect(type)
+{
+    $("em[name='radio']").removeClass("on");
+    $("em[name='radio'][data-value='" + type + "']").addClass("on");
+    
+    if($("#word").hasClass("on"))
+	{
+		var type = "word";
+	}
+	else
+	{
+		var type ="html";
+	}
+
+	var isEnglish = $("#isEnglish").val();
+	var resumeID = $("#resumeid").val();
+	var domain = $("#domain").val();	
+	var action_url = domain+"/resume_preview.php?lang="+isEnglish+"&act=export&resumeid="+resumeID+"&type="+type;	
+	$("#action").attr("href", action_url);
+}

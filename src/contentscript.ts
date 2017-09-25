@@ -178,7 +178,6 @@ function parse51job(data: TableData, keywords: {[k in string]: number}) {
       const tdTxt = td.textContent ? td.textContent.trim() : '';
       if (tdTxt === '工作经验' || tdTxt === '项目经验') {
         let foundCounter = false;
-        // const table = td.closest('table').querySelector('table');
         const table = td.parentElement.nextElementSibling as HTMLElement;
         if (table) {
           Array.from(table.querySelectorAll('.tbb>table>tbody>tr')).forEach((tr: HTMLTableRowElement) => {

@@ -13,11 +13,19 @@ test('test fetch html', () => {
   expect(document.body.innerHTML).toContain('51job');
   const data = extractTags();
   expect(data.scores).toBeGreaterThan(8);
+  expect(data.scores).toBeLessThan(18);
 });
 test('test empty', () => {
   document.body.innerHTML = '<h1></h1>';
+  if (!document.URL.includes('51job')) {
+    Object.defineProperty(document, 'URL', {
+      get() {
+        return 'http://i.51job.com/resume/resume_preview.php?lang=c&resumeid=';
+      }
+    });
+  }
   expect(document.URL).toContain('51job');
   const data = extractTags();
   expect(data.scores).toBe(0);
-  expect(data.error).toContain('流动性比利润更重要！');
+  expect(data.error).toContain('！');
 });
