@@ -175,14 +175,15 @@ function parse51job(data: TableData, keywords: {[k in string]: number}) {
     let article = '';
     let counter = 0;
     tds.forEach((td: HTMLTableDataCellElement) => {
-      const tdTxt = td.innerText ? td.innerText.trim() : '';
+      const tdTxt = td.textContent ? td.textContent.trim() : '';
       if (tdTxt === '工作经验' || tdTxt === '项目经验') {
         let foundCounter = false;
-        const table = td.closest('table').querySelector('table');
+        // const table = td.closest('table').querySelector('table');
+        const table = td.parentElement.nextElementSibling as HTMLElement;
         if (table) {
           Array.from(table.querySelectorAll('.tbb>table>tbody>tr')).forEach((tr: HTMLTableRowElement) => {
             const time = tr.querySelector('.time') as HTMLSpanElement;
-            let [start, end] = time ? time.innerText.split('-') : ['0', '0'];
+            let [start, end] = time ? time.textContent.split('-') : ['0', '0'];
             if (end === '至今') {
               end = new Date().toLocaleDateString();
             }
@@ -196,7 +197,7 @@ function parse51job(data: TableData, keywords: {[k in string]: number}) {
               m = d.getMonth() + 1;
               mm = y * 12 + m; // 总月数
             }
-            const str = tr.innerText;
+            const str = tr.textContent;
             let found = false;
             Object.keys(keywords).forEach(k => {
               const v = keywords[k];
@@ -227,7 +228,7 @@ function parse51job(data: TableData, keywords: {[k in string]: number}) {
             });
             if (found) {
               const tb1 = Array.from(tr.querySelectorAll('.txt1')).pop() as HTMLTableCellElement;
-              article += tb1 ? tb1.innerText : '';
+              article += tb1 ? tb1.textContent : '';
             }
           });
         }
@@ -272,7 +273,7 @@ function parseLagou(data: TableData, keywords: {[k in string]: number}) {
       if (content) {
         // Array.from(td.querySelectorAll('.tbb>table>tbody>tr')).forEach((tr)=>{
         const time = td.querySelector('.mr_content_r') as HTMLSpanElement;
-        let timeStr = time.innerText;
+        let timeStr = time.textContent;
         timeStr = timeStr.replace(/\s/g, '');
         timeStr = timeStr.replace(/\./g, '/');
         timeStr = timeStr.replace(/-/g, '—');
@@ -292,7 +293,7 @@ function parseLagou(data: TableData, keywords: {[k in string]: number}) {
           m = d.getMonth() + 1;
           mm = y * 12 + m; // 总月数
         }
-        const str = td.innerText;
+        const str = td.textContent;
         let found = false;
         Object.keys(keywords).forEach(k => {
           const v = keywords[k];
@@ -323,7 +324,7 @@ function parseLagou(data: TableData, keywords: {[k in string]: number}) {
         });
         if (found) {
           const tb1 = Array.from(td.querySelectorAll('.mr_content_m')).pop() as HTMLTableCellElement;
-          article += tb1 ? tb1.innerText : '';
+          article += tb1 ? tb1.textContent : '';
         }
         // });
       }
@@ -348,7 +349,7 @@ function parseLagou(data: TableData, keywords: {[k in string]: number}) {
     const w = Object.keys(keywords).map(v => v.replace(/\(|\)/g, '')).join('|');
     const wordReg = new RegExp('\\b(' + w + ')\\b', 'gi');
     const timeReg = /(20\d{2}.\d{1,2})[\s\n-—]*(20\d{2}.\d{1,2}|至今)/gi;
-    const str = pdf.innerText;
+    const str = pdf.textContent;
     const timeRange = [] as number[][];
     for (let i = 0; i < 50; i++) {
       const o1 = timeReg.exec(str);

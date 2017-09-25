@@ -12,5 +12,12 @@ test('test fetch html', () => {
   expect(document.URL).toContain('51job');
   expect(document.body.innerHTML).toContain('51job');
   const data = extractTags();
-  expect(data.scores).toBeGreaterThan(0);
+  expect(data.scores).toBeGreaterThan(8);
+});
+test('test empty', () => {
+  document.body.innerHTML = '<h1></h1>';
+  expect(document.URL).toContain('51job');
+  const data = extractTags();
+  expect(data.scores).toBe(0);
+  expect(data.error).toContain('流动性比利润更重要！');
 });

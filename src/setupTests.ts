@@ -23,6 +23,16 @@ if (!origin.ok) {
     return { message: msg, pass };
   };
 }
-// console.log('☞☞☞ 9527 setupTests 13', global[GLOBAL_STATE].matchers.toBeGreaterThan);
+function closest(el: HTMLElement, selector: string) {
+  var matchesSelector = el.matches || el.webkitMatchesSelector || el.mozMatchesSelector || el.msMatchesSelector;
+
+  while (el) {
+    if (matchesSelector.call(el, selector)) {
+      break;
+    }
+    el = el.parentElement;
+  }
+  return el;
+}
 (window as any).chrome = require('sinon-chrome'); // tslint:disable-line
 (global as any).chrome = require('sinon-chrome'); // tslint:disable-line
