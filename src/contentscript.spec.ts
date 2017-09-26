@@ -1,5 +1,3 @@
-import any = jasmine.any;
-
 const fs = require('fs');
 import { extractTags, TableData } from './contentscript';
 
@@ -14,12 +12,14 @@ test('test fetch html', () => {
   expect(document.URL).toContain('51job');
   expect(document.body.innerHTML).toContain('51job');
   const data = extractTags();
-  expect(data).toHaveProperty('article');
-  expect(data).toHaveProperty('title');
-  expect(data).toHaveProperty('url');
-  expect(data).toHaveProperty('scores');
-  expect(data).toHaveProperty('skills');
-  expect(data).toHaveProperty('error');
+  expect(data).toEqual(expect.objectContaining({
+    article: expect.any(String),
+    title: expect.any(String),
+    url: expect.any(String),
+    scores: expect.any(Number),
+    skills: expect.any(Array),
+    error: null,
+  }));
   expect(data.article.length).toBeGreaterThan(100);
   expect(data.title.length).toBeGreaterThan(1);
   expect(data.url.length).toBeGreaterThan(1);
