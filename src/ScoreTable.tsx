@@ -7,12 +7,12 @@ export default class ScoreTable extends React.PureComponent<ScoreTableProps, {}>
   columns: ColumnProps<SkillItem>[];
 
   constructor(props: ScoreTableProps) {
-    super(props);
+    super();
     this.state = {};
     this.columns = [
       { title: '关键字', dataIndex: 'kw' },
-      { title: '时长', dataIndex: 'age' },
-      { title: '得分', dataIndex: 'score' },
+      { title: '时长', dataIndex: 'age', render(val: number) {return val + '月'} },
+      { title: '得分', dataIndex: 'score', render(val: number){ return val.toFixed(1)} },
     ];
   }
 
@@ -56,6 +56,6 @@ export interface ScoreTableProps {
 
 export interface SkillItem {
   kw: string;
-  age: string;
-  score: string;
+  age: number;
+  score: number;
 }

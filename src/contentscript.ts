@@ -238,8 +238,8 @@ function parse51job(data: TableData, keywords: {[k in string]: number}) {
     data.scores = Object.keys(keywords).reduce((o, k) => o += scores[k], 0);
     data.skills = Object.keys(keywords).filter(k => mouths[k] > 0).map((k) => ({
         kw: k.replace(/\(|\)/, '').split('|').shift(),
-        age: mouths[k] + '月',
-        score: scores[k].toFixed(1),
+        age: Number(mouths[k]),
+        score: Number(scores[k]),
       }));
     if (scores === 0) {
       data.skills = [];
@@ -333,8 +333,8 @@ function parseLagou(data: TableData, keywords: {[k in string]: number}) {
     data.scores = Object.keys(keywords).reduce((o, k) => o += scores[k], 0);
     data.skills = Object.keys(keywords).filter(k => mouths[k] > 0).map((k) => ({
       kw: k.replace(/\(|\)/, '').split('|').shift(),
-      age: mouths[k] + '月',
-      score: scores[k].toFixed(1),
+      age: Number(mouths[k]),
+      score: Number(scores[k]),
     }));
     if (scores === 0) {
       data.skills = [];
@@ -410,8 +410,8 @@ function parseLagou(data: TableData, keywords: {[k in string]: number}) {
     data.scores = Object.keys(keywords).reduce((o, k) => o += scores[k], 0);
     data.skills = Object.keys(keywords).filter(k => mouths[k] > 0).map((k) => ({
       kw: k.replace(/\(|\)/, '').split('|').shift(),
-      age: mouths[k] + '月',
-      score: scores[k].toFixed(1),
+      age: Number(mouths[k]),
+      score: Number(scores[k]),
     }));
     if (scores === 0) {
       data.skills = [];

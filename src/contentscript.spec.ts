@@ -20,6 +20,11 @@ test('test fetch html', () => {
     skills: expect.any(Array),
     error: null,
   }));
+  expect(data.skills.pop()).toEqual(expect.objectContaining({
+    kw: expect.any(String),
+    age: expect.any(Number),
+    score: expect.any(Number),
+  }));
   expect(data.article.length).toBeGreaterThan(100);
   expect(data.title.length).toBeGreaterThan(1);
   expect(data.url.length).toBeGreaterThan(1);
