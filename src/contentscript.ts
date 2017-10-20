@@ -1,5 +1,7 @@
+import { sum, values } from 'lodash';
 import ext from './utils/ext';
 import { SkillItem } from './ScoreTable';
+import keywords, { Calc, db, KeywordItem } from './keywords';
 
 type T = () => TableData;
 
@@ -18,133 +20,6 @@ export function extractTags(): TableData {
     error: null,
   };
 
-  const keywords = {
-    // 以下key会作为正则的一部分，不要加不相关的符号
-    // 核心项
-    '(es6|ECMAScript6|es2015)': 2.5,
-    '(es7|ECMAScript7|es2016)': 1.5,
-    'react': 2,
-    '(vue|vuejs|vue2)': 2,
-    '(angular2|angular4)': 2,
-    '(angular|angularjs)': 1.5,
-
-    // 函数式
-    '(ts|typescript)': 2,
-    '(redux|react-redux)': 2,
-    'vuex': 2,
-    'saga': 2,
-    'dva': 2,
-    '(rxjs|ReactiveX)': 1.5,
-    'lodash': 1,
-
-    // 质量
-    'mocha': 1.5,
-    'jasmine': 1.5,
-    'jest': 1.5,
-    'ava': 1.5,
-    '(mock|mocking)': 1.5,
-    '(eslint|jslint)': 1,
-
-    // 样式
-    '(less|sass|scss)': 1,
-    'postcss': 1,
-    'stylus': 1,
-    '(flexbox|flex)': 1,
-
-    // ui / mobile
-    '(element|elementUI|eleme|elemeUI)': 1.5,
-    '(antd|Ant Design)': 1.5,
-    'react native': 1,
-    'vux': 1,
-
-    // 附加分
-    '(express|koa|koa2)': 0.5,
-    '(node|nodejs)': 0.3,
-    'ionic': 0.3,
-    'ionic2': 0.5,
-    'jenkins': 0.3,
-    '(gulp|gulp4)': 0.3,
-    'grunt': 0.2,
-    'ApiCloud': 0.3,
-    '(jQuery.Mobile|jqm)': 0.3,
-    '(PhantomJS|Phantom)': 0.3,
-    'underscore': 0.3,
-    'websocket': 0.5,
-    '(webpack|webpack2)': 0.5,
-    'babel': 0.3,
-    'browserify': 0.2,
-    'browser.sync': 0.2,
-    'canvas': 0.3,
-    '(velocity|velocityjs)': 0.5,
-    'animate.css': 0.3,
-    '(greensock|gsap)': 0.3,
-    'webgl': 0.5,
-    '(requirejs|require.js)': 0.3,
-    '(fis|fis3)': 0.2,
-    '(sea|seajs)': 0.2,
-    'git': 0.3,
-    'svn': 0.2,
-    'github': 0.5,
-    'axure': 0.5,
-    'axios': 0.3,
-    'fetch': 0.2,
-    '(d3|d3js)': 0.3,
-    'knockout': 0.2,
-    'ember': 0.2,
-    'backbone': 0.2,
-    '(shim|polyfill)': 0.2,
-    'html5': 0.3,
-    'css3': 0.3,
-    'graphQL': 0.5,
-    '(as3|ActionScript3)': 0.3,
-    '(photoshop|ps)': 0.3,
-    'spa': 0.5,
-    'pwa': 0.5,
-    'amp': 0.2,
-    'fullpage': 0.2,
-    'router': 0.2,
-    'service': 0.2,
-    'XSS': 0.5,
-    'csrf': 0.5,
-    'cordova': 0.3,
-    'hack': 0.3,
-    'SOAP': 0.2,
-    'yeoman': 0.2,
-    'bower': 0.2,
-    'bash': 0.2,
-    'review': 0.3,
-    '(linux|centos)': 0.2,
-    'mvvm': 0.3,
-    'mvc': 0.2,
-
-    '(restful|rest|restAPI|restfulAPI)': 0.1,
-    '(sql|mysql|sqlserver|mongodb|redis|db2|oracle)': 0.1,
-    'jwt': 0.1,
-    'seo': 0.1,
-    'cdn': 0.1,
-    '(webstorm|vscode)': 0.1,
-    '(ajax|jsonp)': 0.1,
-    '(bootstrap|bootstrap4)': 0.1,
-    'hybird': 0.1,
-    'vue-resource': 0.1,
-    'svg': 0.1,
-    '(echart|echarts)': 0.1,
-    'rem': 0.1,
-    'flash': 0.1,
-    'media': 0.1,
-    'C#': 0.1,
-    'java': 0.1,
-    'php': 0.1,
-    'python': 0.1,
-    '(xcode|ios|swift)': 0.1,
-    'nginx': 0.1,
-    'weui': 0.1,
-    'iscroll': 0.1,
-    'mobiscroll': 0.1,
-    '(mint|mui)': 0.1,
-    'cms': 0.1,
-  };
-
   const ogTitle = document.querySelector('meta[property=\'og:title\']');
   if (ogTitle) {
     data.title = ogTitle.getAttribute('content');
@@ -152,8 +27,8 @@ export function extractTags(): TableData {
     data.title = document.title;
   }
 
-  parse51job(data, keywords);
-  parseLagou(data, keywords);
+  parse51job(data, keywords, db);
+  parseLagou(data, keywords, db);
 
   const descriptionTag = document.querySelector('meta[property*=description]');
   if (descriptionTag) {
@@ -163,14 +38,14 @@ export function extractTags(): TableData {
   return data;
 }
 
-function parse51job(data: TableData, keywords: {[k in string]: number}) {
+function parse51job(data: TableData, kw: {[k in string]: number}, dbs: KeywordItem[]) {
   if (!document.URL.includes('51job.com')) {
     return {};
   }
   const tds = Array.from(document.querySelectorAll('.plate1'));
   if (tds) {
-    const scores = Object.keys(keywords).reduce((o, k) => (o[k] = 0, o), {});
-    const mouths = Object.keys(keywords).reduce((o, k) => (o[k] = 0, o), {});
+    const scores = Object.keys(kw).reduce((o, k) => (o[k] = 0, o), {});
+    const mouths = Object.keys(kw).reduce((o, k) => (o[k] = 0, o), {});
     let article = '';
     let counter = 0;
     tds.forEach((td: HTMLTableDataCellElement) => {
@@ -197,8 +72,8 @@ function parse51job(data: TableData, keywords: {[k in string]: number}) {
             }
             const str = tr.textContent;
             let found = false;
-            Object.keys(keywords).forEach(k => {
-              const v = keywords[k];
+            Object.keys(kw).forEach(k => {
+              const v = kw[k];
               const arr = str.match(new RegExp(`\\b${k}\\b`, 'gi'));
               if (arr && arr.length > 0) {
                 if (mm > 0) {
@@ -235,8 +110,8 @@ function parse51job(data: TableData, keywords: {[k in string]: number}) {
         }
       }
     });
-    data.scores = Object.keys(keywords).reduce((o, k) => o += scores[k], 0);
-    data.skills = Object.keys(keywords).filter(k => mouths[k] > 0).map((k) => ({
+    data.scores = sum(values(scores));
+    data.skills = Object.keys(kw).filter(k => mouths[k] > 0).map((k) => ({
         kw: k.replace(/\(|\)/, '').split('|').shift(),
         age: Number(mouths[k]),
         score: Number(scores[k]),
@@ -254,7 +129,7 @@ function parse51job(data: TableData, keywords: {[k in string]: number}) {
   return data;
 }
 
-function parseLagou(data: TableData, keywords: {[k in string]: number}) {
+function parseLagou(data: TableData, keywords: {[k in string]: number}, dbs: KeywordItem[]) {
   if (!document.URL.includes('lagou')) {
     return {};
   }
@@ -330,7 +205,7 @@ function parseLagou(data: TableData, keywords: {[k in string]: number}) {
         counter += 1;
       }
     });
-    data.scores = Object.keys(keywords).reduce((o, k) => o += scores[k], 0);
+    data.scores = sum(values(scores));
     data.skills = Object.keys(keywords).filter(k => mouths[k] > 0).map((k) => ({
       kw: k.replace(/\(|\)/, '').split('|').shift(),
       age: Number(mouths[k]),
@@ -407,7 +282,7 @@ function parseLagou(data: TableData, keywords: {[k in string]: number}) {
       }
     }
 
-    data.scores = Object.keys(keywords).reduce((o, k) => o += scores[k], 0);
+    data.scores = sum(values(scores));
     data.skills = Object.keys(keywords).filter(k => mouths[k] > 0).map((k) => ({
       kw: k.replace(/\(|\)/, '').split('|').shift(),
       age: Number(mouths[k]),
@@ -437,7 +312,6 @@ ext.runtime.onMessage.addListener(onRequest);
 
 export interface TableData {
   title: string;
-  // description: string;
   url: string;
   scores: number;
   skills: SkillItem[];

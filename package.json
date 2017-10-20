@@ -10,11 +10,14 @@
   },
   "dependencies": {
     "antd": "^2.13.2",
+    "fuse-test-runner": "^1.0.15",
+    "jsx-controls-loader": "^0.1.1",
     "react": "^15.6.1",
     "react-dom": "^15.6.1",
     "react-scripts-ts": "2.7.0",
     "vinyl-buffer": "^1.0.0",
-    "vinyl-source-stream": "^1.1.0"
+    "vinyl-source-stream": "^1.1.0",
+    "wafl": "^0.3.26"
   },
   "devDependencies": {
     "@types/enzyme": "^2.8.8",
