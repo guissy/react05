@@ -100,9 +100,9 @@ export class Tree<T extends TreeItem> implements IterableIterator<TreeItem> {
     let item: T = null;
     let index0 = 0;
     if (this.items.length > 0) {
-      this.items.forEach((item0: TreeItem) => {
+      this.items.forEach((item0: T) => {
         if (Array.isArray(item0.children) && item0.children.length > 0 && item === null) {
-          item = item0.children[0];
+          item = item0.children[0] as T;
         } else {
           console.log('\u2665  107', item0);
           item = item0;
