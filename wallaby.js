@@ -46,11 +46,8 @@ module.exports = function(wallaby) {
     },
     testFramework: 'jest',
     setup: function(wallaby) {
-      // require('./src/setupTests');
-      // require('wafl').setup({ wallaby });
       console.log('\u2665 setup 49', 'wallaby', wallaby);
       const appDirectory = require('fs').realpathSync(process.cwd());
-      // const createJestConfig = require('react-scripts-ts/scripts/utils/createJestConfig')
       const path = require('path');
       const jestConfig = {
         mapCoverage: true,
@@ -60,7 +57,7 @@ module.exports = function(wallaby) {
         testMatch: [
           // '.spec.',
         ],
-        testEnvironment: 'node',
+        testEnvironment: 'jsdom',
         testURL: 'http://localhost',
         transform: {
           '^.+\\.css$': require.resolve('react-scripts-ts/config/jest/cssTransform.js'),
@@ -95,11 +92,7 @@ module.exports = function(wallaby) {
         rootDir: wallaby.localProjectDir,
       };
 
-      console.log('\u2665 setup 56', jestConfig);
-      // var jestConfig = require('./package.json').jest;
-      // jestConfig.globals["__DEV__"] = true;
       wallaby.testFramework.configure(jestConfig);
-      // require('C:\\Users\\frog\\WebstormProjects\\react05\\src\\setupTests1.js');
     },
     teardown: function(wallaby) {
       // require('apollo-connector-mongodb').stopDatabase();

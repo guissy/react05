@@ -97,7 +97,7 @@ export class Tree<T extends TreeItem> implements IterableIterator<TreeItem> {
   next(value?: T): IteratorResult<T> {
     // 忽略 level 1, 遍历 level 2 和 level 3
     // 分别使用 Lv1 Lv2 Lv3 表示各级别
-    let item: any = null;
+    let item: T = null;
     let index0 = 0;
     if (this.items.length > 0) {
       this.items.forEach((item0: TreeItem) => {
