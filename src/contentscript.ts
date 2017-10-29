@@ -27,8 +27,8 @@ export function extractTags(): TableData {
     data.title = document.title;
   }
 
-  parse51job(data, keywords, db);
-  parseLagou(data, keywords, db);
+  // parse51job(data, keywords, db);
+  // parseLagou(data, keywords, db);
 
   const descriptionTag = document.querySelector('meta[property*=description]');
   if (descriptionTag) {

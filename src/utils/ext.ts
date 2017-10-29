@@ -21,7 +21,8 @@ const apis = [
   'webRequest',
   'windows',
 ];
-declare const window: any; // tslint:disable-line
+// declare const window: any; // tslint:disable-line
+
 const chrome = window.chrome;
 class Extension { // tslint:disable-line
   browserAction: any; // tslint:disable-line

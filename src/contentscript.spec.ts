@@ -1,8 +1,9 @@
 const fs = require('fs');
+// require('./setupTests1.js');
 import { extractTags, TableData } from './contentscript';
 
 test('test fetch html', () => {
-  const html = fs.readFileSync('./src/jest/my.htm');
+  const html = fs.readFileSync('./src/jest/my.html');
   document.body.innerHTML = html;
   Object.defineProperty(document, 'URL', {
     get() {

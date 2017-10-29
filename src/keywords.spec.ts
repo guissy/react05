@@ -1,7 +1,7 @@
 import { db, Tree } from './keywords';
 
 it('keyword', () => {
-  const tree = new Tree(db);
+  const tree = new Tree(db) as any;
   const i = 0;
   let n = 0;
   for (const it of tree) {

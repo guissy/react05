@@ -15,7 +15,7 @@ export interface KeywordItem extends TreeItem {
   children?: KeywordItem[];
 }
 
-const db = [
+export const db = [
   {
     name: '核心项',
     score: 10,
@@ -84,9 +84,9 @@ const db = [
   ]
   }
 ];
-export const db;
+// export const db;
 
-export class Tree<T extends TreeItem> implements IterableIterator {
+export class Tree<T extends TreeItem> implements IterableIterator<TreeItem> {
   private index: number = 0;
   constructor(private items: TreeItem[]) {
     if (!Array.isArray(items)) {
@@ -97,7 +97,7 @@ export class Tree<T extends TreeItem> implements IterableIterator {
   next(value?: T): IteratorResult<T> {
     // 忽略 level 1, 遍历 level 2 和 level 3
     // 分别使用 Lv1 Lv2 Lv3 表示各级别
-    let item = null;
+    let item: any = null;
     let index0 = 0;
     if (this.items.length > 0) {
       this.items.forEach((item0: TreeItem) => {

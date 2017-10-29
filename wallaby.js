@@ -1,23 +1,28 @@
 const jsxtransform = require("fuse-test-runner").wallabyFuseTestLoader;
 'use strict';
 const path = require('path');
+const fs = require('fs');
 // const jsxtransform = require('jsx-controls-loader').loader;
 
 module.exports = function(wallaby) {
   return {
     files: [
-      // './setupTests.ts',
+      'src/setupTests.ts',
       'src/*.ts*',
+      // 'src/*.js',
       'src/utils/**/*.ts*',
-      '!src/setupTests.ts',
+      '!src/*.spec.ts',
       '!src/**/*.spec.tsx',
       '!src/**/*.spec.ts',
-      '!src/**/*.d.ts*'
+      '!src/**/*.d.ts*',
+      'src/**/*.html',
     ],
     tests: [
-      'src/setupTests.ts',
-      'src/**/*.spec.tsx', 
-      'src.**/*.spec.ts', 
+      // 'src/setupTests.ts',
+      'src/*.spec.ts',
+      'src/**/*.spec.tsx',
+      'src/**/*.spec.ts',
+      // 'src/**/*.html',
       'src/**/snapshots/*.json'
     ],
     compilers: {
@@ -39,9 +44,62 @@ module.exports = function(wallaby) {
     delays: {
       run: 200
     },
-    testFramework: 'mocha',
+    testFramework: 'jest',
     setup: function(wallaby) {
+      // require('./src/setupTests');
       // require('wafl').setup({ wallaby });
+      console.log('\u2665 setup 49', 'wallaby', wallaby);
+      const appDirectory = require('fs').realpathSync(process.cwd());
+      // const createJestConfig = require('react-scripts-ts/scripts/utils/createJestConfig')
+      const path = require('path');
+      const jestConfig = {
+        mapCoverage: true,
+        collectCoverageFrom: ['src/**/*.{js,jsx,ts,tsx}'],
+        setupFiles: [require.resolve('react-scripts-ts/config/polyfills.js')],
+        setupTestFrameworkScriptFile: path.resolve(appDirectory, './src/setupTests.ts'),
+        testMatch: [
+          // '.spec.',
+        ],
+        testEnvironment: 'node',
+        testURL: 'http://localhost',
+        transform: {
+          '^.+\\.css$': require.resolve('react-scripts-ts/config/jest/cssTransform.js'),
+          '^.+\\.tsx?$': require.resolve('react-scripts-ts/config/jest/typescriptTransform.js'),
+          '^(?!.*\\.(js|jsx|css|json|html)$)': require.resolve('react-scripts-ts/config/jest/fileTransform.js'),
+        },
+        transformIgnorePatterns: [
+          '[/\\\\]node_modules[/\\\\].+\\.(js|jsx|ts|tsx)$',
+        ],
+        moduleNameMapper: {
+          '^react-native$': 'react-native-web',
+        },
+        moduleFileExtensions: [
+          'web.ts',
+          'ts',
+          'web.tsx',
+          'tsx',
+          'web.js',
+          'js',
+          'web.jsx',
+          'jsx',
+          'json',
+          'html',
+          'node'
+        ],
+        globals: {
+          'ts-jest': {
+            tsConfigFile: wallaby.localProjectDir + 'tsconfig.json',
+          },
+          '__DEV__': true,
+        },
+        rootDir: wallaby.localProjectDir,
+      };
+
+      console.log('\u2665 setup 56', jestConfig);
+      // var jestConfig = require('./package.json').jest;
+      // jestConfig.globals["__DEV__"] = true;
+      wallaby.testFramework.configure(jestConfig);
+      // require('C:\\Users\\frog\\WebstormProjects\\react05\\src\\setupTests1.js');
     },
     teardown: function(wallaby) {
       // require('apollo-connector-mongodb').stopDatabase();

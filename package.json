@@ -9,12 +9,16 @@
     "eject": "react-scripts-ts eject"
   },
   "dependencies": {
+    "@types/chrome": "^0.0.51",
     "antd": "^2.13.2",
     "fuse-test-runner": "^1.0.15",
     "jsx-controls-loader": "^0.1.1",
     "react": "^15.6.1",
     "react-dom": "^15.6.1",
     "react-scripts-ts": "2.7.0",
+    "ts-jest": "^21.1.4",
+    "tslint-react": "^3.2.0",
+    "typescript": "^2.5.3",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0",
     "wafl": "^0.3.26"
@@ -23,7 +27,7 @@
     "@types/enzyme": "^2.8.8",
     "@types/jest": "^21.1.0",
     "@types/lodash": "^4.14.74",
-    "@types/node": "^8.0.30",
+    "@types/node": "^8.0.47",
     "@types/react": "^16.0.5",
     "@types/react-dom": "^15.5.4",
     "awesome-typescript-loader": "^3.2.3",
