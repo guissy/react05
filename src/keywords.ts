@@ -94,6 +94,7 @@ export class Tree<T extends TreeItem> implements IterableIterator<TreeItem> {
     }
   }
 
+/*
   next(value?: T): IteratorResult<T> {
     // 忽略 level 1, 遍历 level 2 和 level 3
     // 分别使用 Lv1 Lv2 Lv3 表示各级别
@@ -104,19 +105,27 @@ export class Tree<T extends TreeItem> implements IterableIterator<TreeItem> {
         if (Array.isArray(item0.children) && item0.children.length > 0 && item === null) {
           item = item0.children[0] as T;
         } else {
-          console.log('\u2665  107', item0);
+          // console.log('\u2665  107', item0);
           item = item0;
         }
         index0 += 1;
       });
     }
-    console.log('\u2665 next 113', this.items.length);
+    if (index0 > Math.pow(2, 20)) {
+      item = null;
+    }
+    console.log('\u2665 next', item, this.items.length);
     return { value: item, done: item === null };
   }
-
-  return(value?: T): IteratorResult<T> {
-    return { value, done: false };
+*/
+  next() {
+    this.index ++;
+    return { value: this.index, done: this.index > 10 };
   }
+
+  // return(value?: T): IteratorResult<T> {
+  //   return { value, done: false };
+  // }
 
   throw(e?: Error): IteratorResult<T> {
     return { value: null, done: true };

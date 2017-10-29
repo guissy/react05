@@ -46,7 +46,7 @@ module.exports = function(wallaby) {
     },
     testFramework: 'jest',
     setup: function(wallaby) {
-      console.log('\u2665 setup 49', 'wallaby', wallaby);
+      // console.log('\u2665 setup 49', 'wallaby', wallaby);
       const appDirectory = require('fs').realpathSync(process.cwd());
       const path = require('path');
       const jestConfig = {
@@ -55,7 +55,7 @@ module.exports = function(wallaby) {
         setupFiles: [require.resolve('react-scripts-ts/config/polyfills.js')],
         setupTestFrameworkScriptFile: path.resolve(appDirectory, './src/setupTests.ts'),
         testMatch: [
-          // '.spec.',
+          '.spec.',
         ],
         testEnvironment: 'jsdom',
         testURL: 'http://localhost',
@@ -88,6 +88,7 @@ module.exports = function(wallaby) {
             tsConfigFile: wallaby.localProjectDir + 'tsconfig.json',
           },
           '__DEV__': true,
+          chrome: require('sinon-chrome')
         },
         rootDir: wallaby.localProjectDir,
       };

@@ -34,6 +34,6 @@ function closest(el: HTMLElement, selector: string) {
   }
   return el;
 }
-(global as any).window = { chrome: require('sinon-chrome') } as Window;
+// (global as any).window = { chrome: require('sinon-chrome') } as Window;
 (window as any).chrome = require('sinon-chrome'); // tslint:disable-line
 (global as any).chrome = require('sinon-chrome'); // tslint:disable-line

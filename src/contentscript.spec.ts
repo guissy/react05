@@ -2,7 +2,7 @@ const fs = require('fs');
 // require('./setupTests1.js');
 import { extractTags, TableData } from './contentscript';
 
-test('test fetch html', () => {
+test.skip('test fetch html', () => {
   const html = fs.readFileSync('./src/jest/my.html');
   document.body.innerHTML = html;
   Object.defineProperty(document, 'URL', {
@@ -33,7 +33,7 @@ test('test fetch html', () => {
   expect(data.scores).toBeLessThan(18);
   expect(data.skills.length).toBeGreaterThan(0);
 });
-test('test empty', () => {
+test.skip('test empty', () => {
   document.body.innerHTML = '<h1></h1>';
   if (!document.URL.includes('51job')) {
     Object.defineProperty(document, 'URL', {
