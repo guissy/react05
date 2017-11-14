@@ -7,6 +7,7 @@ const buffer = require('vinyl-buffer');
 const gulpif = require("gulp-if");
 const tsify = require("tsify");
 const rename = require("gulp-rename");
+const replace = require("gulp-replace");
 const preprocessify = require('preprocessify');
 const $ = require('gulp-load-plugins')();
 process.env.BABEL_ENV = 'production';
@@ -157,3 +158,13 @@ function buildJS(target) {
 
   return merge.apply(null, tasks);
 }
+
+gulp.task('parse51job', function () {
+  return gulp.src('src/jest/*.{htm,html}')
+    .pipe(replace(/\d{7,10}/g,''))
+    .pipe(replace(/\d{11,}/g,''))
+    .pipe(replace(/GBK/g,'utf-8'))
+    .pipe(replace(/\w+@/g,''))
+    .pipe(replace(/class="name">[^\x00-\xff]+/g,'class="name">好多钱'))
+    .pipe(gulp.dest('src/jest/'))
+})

@@ -13,7 +13,7 @@ class App extends React.Component<{}, ScoreTableProps> {
     };
     ext.tabs.query({active: true, currentWindow: true}, (tabs: {id: number}[]) => {
       const activeTab = tabs[0];
-      chrome.tabs.sendMessage(activeTab.id, { action: 'process-page' }, (data) => {
+      window.chrome.tabs.sendMessage(activeTab.id, { action: 'process-page' }, (data) => {
         if (data) {
           this.setState(data);
         } else {

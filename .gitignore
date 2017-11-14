@@ -19,6 +19,7 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+<<<<<<< HEAD
 .idea
 my.htm*
 
@@ -28,3 +29,7 @@ my.htm*
 .idea/datasources.xml
 .idea/dataSources.ids
 
+=======
+.idea*
+/src/jest*
+>>>>>>> af8e9d95a5223c59ed8b27fc71aaae2be3e61773
