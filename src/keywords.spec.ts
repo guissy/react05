@@ -1,21 +1,29 @@
-import { db, Tree } from './keywords';
-// import './setupTests';
-it('keyword', () => {
+import { Calc, Tree } from './keywords';
+import { arr, db } from './keywords.data';
+
+
+test('keyword', () => {
   const tree = new Tree(db) as any;
-  let i = 0;
-  let n = 0;
-  // const it = tree[Symbol.iterator]();
-  // let e = it.next();
-  // while (!e.done) {
-    // e = it.next();
-  // }
-  // expect(tree.length).toBe(2)
+  let i = 0; // 计数，取前面几条
+  let first = null;
+  let last = null;
   for (let item of tree) {
-    console.log('\u2665  8', item);
+    // console.log('☞☞☞ 9527 keywords.spec 106', i, item.name);
     if (i === 0) {
-      expect(item.name).toEqual('es6');
-      i += 1;
+      first = item;
+    } else if (i === tree.length - 1) {
+      last = item;
     }
+    i += 1;
   }
-  expect(n).toBe(1);
+  expect(first.name).toEqual('es6');
+  expect(last.name).toEqual('prettier');
+  expect(tree).toHaveLength(arr.length);
+  expect(tree.walked).toContainEqual(arr[0]);
+});
+
+test('keyword calc', () => {
+  const tree = new Tree(db) as any;
+  const n = tree.calc();
+  expect(n).toBe(0)
 });
