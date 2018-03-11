@@ -125,7 +125,7 @@ export class Tree<T extends TreeItem> implements IterableIterator<TreeItem> {
     });
   }
 
-  // 计算总分
+  // 计算总分, 公式为 score * months
   calc(items: KeywordItem[] = this.items): number {
     let totalGained = 0;
     items.forEach((item: KeywordItem) => {
@@ -144,10 +144,12 @@ export class Tree<T extends TreeItem> implements IterableIterator<TreeItem> {
     return totalGained;
   }
 
-  calcMonth(works: WorkDate[]) {
+  // 时间戳
+  calcMonth(works: WorkDate[]): number {
     let result = 0;
     if (Array.isArray(works)) {
       works.sort(({startDate: s1}, {startDate: s2}) => s1.getTime() - s2.getTime());
+      console.log('\u2665 calcMonth 152', works);
       const { delay } = works.reduce(({startDate: s1, endDate: e1, delay}, {startDate: s2, endDate: e2}) => {
         // 1 包含 2
         let startDate = new Date(0);
@@ -155,15 +157,14 @@ export class Tree<T extends TreeItem> implements IterableIterator<TreeItem> {
         if (e1 > e2) {
           startDate = s1;
           endDate = e1;
-          delay += endDate.getTime() - startDate.getTime();
-        } else if (s2 < e1 && e2 > e1) {
+          delay += 0;
+        } else if (s2 < e1) {
           startDate = s1;
           endDate = e2;
-          delay += endDate.getTime() - startDate.getTime();
-        } else if (s2 > e1) {
+          delay += e2.getTime() - e1.getTime();
+        } else if (s2 >= e1) {
           startDate = s2;
           endDate = e2;
-          delay += e1.getTime() - s1.getTime();
           delay += e2.getTime() - s2.getTime();
         }
         return { startDate, endDate, delay };
@@ -194,6 +195,8 @@ export class Tree<T extends TreeItem> implements IterableIterator<TreeItem> {
         monthsValid = Math.min(months, 12);
       } else if (score <= 3) {
         monthsValid = Math.min(months, 15);
+      } else {
+        monthsValid = Math.min(months, 18);
       }
     }
     return score * monthsValid / 6;
