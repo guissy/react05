@@ -21,7 +21,7 @@ export interface KeywordItem extends TreeItem {
 export interface WorkDate {
   startDate: Date;
   endDate: Date;
-  work?: string;
+  workContent?: string;
 }
 
 export const db = [
@@ -116,7 +116,7 @@ export class Tree<T extends TreeItem> implements IterableIterator<TreeItem> {
         keywordItem.alias = [];
       }
       const kws = keywordItem.alias.concat(keywordItem.name).join('|');
-      if (workDate.work.match(new RegExp(`\\b${kws}\\b`, 'gi'))) {
+      if (workDate.workContent.match(new RegExp(`\\b${kws}\\b`, 'gi'))) {
         if (!Array.isArray(keywordItem.works)) {
           keywordItem.works = []
         }
@@ -149,7 +149,7 @@ export class Tree<T extends TreeItem> implements IterableIterator<TreeItem> {
     let result = 0;
     if (Array.isArray(works)) {
       works.sort(({startDate: s1}, {startDate: s2}) => s1.getTime() - s2.getTime());
-      console.log('\u2665 calcMonth 152', works);
+      // console.log('\u2665 calcMonth 152', works);
       const { delay } = works.reduce(({startDate: s1, endDate: e1, delay}, {startDate: s2, endDate: e2}) => {
         // 1 包含 2
         let startDate = new Date(0);

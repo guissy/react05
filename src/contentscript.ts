@@ -1,7 +1,7 @@
 import { sum, values } from 'lodash';
 import ext from './utils/ext';
 import { SkillItem } from './ScoreTable';
-import { KeywordItem, default as keywords, Tree, WorkDate } from './keywords';
+import { KeywordItem, Tree, WorkDate } from './keywords';
 import { db } from './keywords.data';
 
 type T = () => TableData;
@@ -39,7 +39,6 @@ export function extractTags(): TableData {
   return data;
 }
 
-
 function calcWorkDate(start: string, end: string): WorkDate {
   let startDate = new Date(start);
   let endDate = end === '至今' ? new Date() : new Date(end);
@@ -47,214 +46,141 @@ function calcWorkDate(start: string, end: string): WorkDate {
   return {
     startDate,
     endDate,
-  }
+  };
 }
 
 function parse51job(data: TableData, keywords: Tree<KeywordItem>): TableData {
   if (!document.URL.includes('51job.com')) {
     data.error = '目标网址不是 51job.com ';
-    data.scores = -1;
+    data.scores = 0;
     data.skills = [];
+  } else {
+    // 目录：工作经验、项目经验等
+    const dir = Array.from(document.querySelectorAll('.plate1'));
+    let scores = 0;
+    if (dir) {
+      Array.from(document.querySelectorAll('.tbb>table>tbody>tr'))
+        .forEach((tr: HTMLTableRowElement) => {
+          const time = tr.querySelector('.time') as HTMLSpanElement;
+          // 时间段
+          let [start, end] = time ? time.textContent.split('-') : ['0', '0'];
+          const workDate = calcWorkDate(start, end);
+
+          // 内容
+          const elm = Array.from(tr.querySelectorAll('.txt1')).pop() as HTMLTableCellElement;
+          workDate.workContent = elm ? elm.textContent : '';
+          keywords.work(workDate);
+        });
+      scores = keywords.calc(keywords.items);
+      data.scores = scores;
+      data.skills = Array.from(keywords)
+        .filter(({ gained }) => gained > 0)
+        .map(({ gained, months }) => ({
+          age: months,
+          score: gained,
+          kw: name,
+        }));
+    }
+
+    if (data.scores === 0) {
+      data.error = '很遗憾，没匹配到关键字！';
+    }
+    data.article = '...';
   }
-
-  // 目录：工作经验、项目经验等
-  const dir = Array.from(document.querySelectorAll('.plate1'));
-  let scores = 0;
-  if (dir) {
-    Array.from(document.querySelectorAll('.tbb>table>tbody>tr')).forEach((tr: HTMLTableRowElement) => {
-      const time = tr.querySelector('.time') as HTMLSpanElement;
-      // 时间段
-      let [start, end] = time ? time.textContent.split('-') : ['0', '0'];
-      const workDate = calcWorkDate(start, end);
-
-      // 内容
-      const tb1 = Array.from(tr.querySelectorAll('.txt1')).pop() as HTMLTableCellElement;
-      const work = tb1 ? tb1.textContent : '';
-
-      workDate.work = work;
-      keywords.work(workDate);
-
-    });
-
-    scores = keywords.calc(keywords.items);
-  }
-  data.scores = scores;
-  data.skills = Array.from(keywords)
-    .filter(({ gained }) => gained > 0)
-    .map(({ gained, months }) => ({
-      age: months,
-      score: gained,
-      kw: name,
-    }));
-  if (data.scores === 0) {
-    data.error = '很遗憾，没匹配到关键字！';
-  }
-  data.article = '...';
   return data;
 }
-
-function parseLagou(data: TableData, keywords: {[k in string]: number}, dbs: KeywordItem[]) {
+function parseLagou(data: TableData, keywords: Tree<KeywordItem>): TableData {
   if (!document.URL.includes('lagou')) {
-    return {};
-  }
-  const tds = Array.from(document.querySelectorAll('.mr_jobe_list'));
-  const pdf = document.querySelector('.preview-doc') as HTMLElement;
-  if (tds && tds.length > 0) {
-    const scores = Object.keys(keywords).reduce((o, k) => (o[k] = 0, o), {});
-    const mouths = Object.keys(keywords).reduce((o, k) => (o[k] = 0, o), {});
-    let article = '';
-    tds.forEach((td: HTMLTableCellElement) => {
-      const content = td.querySelector('.mr_content_m');
-      if (content) {
-        // Array.from(td.querySelectorAll('.tbb>table>tbody>tr')).forEach((tr)=>{
-        const time = td.querySelector('.mr_content_r') as HTMLSpanElement;
-        let timeStr = time.textContent;
-        timeStr = timeStr.replace(/\s/g, '');
-        timeStr = timeStr.replace(/\./g, '/');
-        timeStr = timeStr.replace(/-/g, '—');
-
-        let [start, end] = time ? timeStr.split('—') : [0, 0];
-        // console.log('\u2714 contentscript  227', timeStr, start, end);
-        if (end === '至今') {
-          end = Date.now();
-        }
-        const t = new Date(end as number).valueOf() - new Date(start as number).valueOf();
-        const d = new Date(t);
-        let y = 0; // 年
-        let m = 0; // 月
-        let mm = 0;
-        if (d) {
-          y = d.getFullYear() - 1970;
-          m = d.getMonth() + 1;
-          mm = y * 12 + m; // 总月数
-        }
-        const str = td.textContent;
-        let found = false;
-        Object.keys(keywords).forEach(k => {
-          const v = keywords[k];
-          const arr = str.match(new RegExp(`\\b${k}\\b`, 'gi'));
-          if (arr && arr.length > 0) {
-            if (mm > 0) {
-              let _mm = mm;
-              if (v <= 0.5) {
-                _mm = Math.min(mm, 6);
-              } else if (v <= 1) {
-                _mm = Math.min(mm, 10);
-              } else if (v <= 2) {
-                _mm = Math.min(mm, 12);
-              } else if (v <= 3) {
-                _mm = Math.min(mm, 15);
-              }
-              if (k.includes('vue')) {
-                _mm = Math.min(mm, 12);
-              }
-              scores[k] = Math.max(scores[k], v * _mm / 6);
-              mouths[k] = Math.max(mouths[k], mm);
-              // words.push(k+' '+mm+'月'+'\n');
-              // console.log('\u2714 contentscript  110', k, v, mm);
-              found = true;
-            }
-          }
-        });
-        if (found) {
-          const tb1 = Array.from(td.querySelectorAll('.mr_content_m')).pop() as HTMLTableCellElement;
-          article += tb1 ? tb1.textContent : '';
-        }
-        // });
-      }
-    });
-    data.scores = sum(values(scores));
-    data.skills = Object.keys(keywords).filter(k => mouths[k] > 0).map((k) => ({
-      kw: k.replace(/\(|\)/, '').split('|').shift(),
-      age: Number(mouths[k]),
-      score: Number(scores[k]),
-    }));
-    if (scores === 0) {
-      data.skills = [];
-      data.error = '很遗憾 ，没匹配到关键字！';
-    }
-    data.article = article;
-  } else if (pdf) {
-    const scores = Object.keys(keywords).reduce((o, k) => (o[k] = 0, o), {});
-    const mouths = Object.keys(keywords).reduce((o, k) => (o[k] = 0, o), {});
-    const w = Object.keys(keywords).map(v => v.replace(/\(|\)/g, '')).join('|');
-    const wordReg = new RegExp('\\b(' + w + ')\\b', 'gi');
-    const timeReg = /(20\d{2}.\d{1,2})[\s\n-—]*(20\d{2}.\d{1,2}|至今)/gi;
-    const str = pdf.textContent;
-    const timeRange = [] as number[][];
-    for (let i = 0; i < 50; i++) {
-      const o1 = timeReg.exec(str);
-      if (o1 === null) {
-        break;
-      } else {
-        let [, start, end] = o1;
-        if (end === '至今') {
-          end = new Date().toLocaleDateString();
-        }
-        const t = new Date(end).valueOf() - new Date(start).valueOf();
-        const d = new Date(t);
-        let y = 0; // 年
-        let m = 0; // 月
-        let mm = 0;
-        if (d) {
-          y = d.getFullYear() - 1970;
-          m = d.getMonth() + 1;
-          mm = y * 12 + m; // 总月数
-        }
-        timeRange.push([mm, o1.index]);
-      }
-    }
-
-    for (let i = 0; i < 50; i++) {
-      const o2 = wordReg.exec(str);
-      if (o2 === null) {
-        break;
-      } else {
-        let [_k] = o2;
-        timeRange.find(([mm, index0], j) => {
-          const next = timeRange[j + 1] ? timeRange[j + 1][1] : str.length;
-          if (o2.index > index0 && o2.index < next) {
-            let _mm = mm;
-            const k = Object.keys(keywords).find(kw => new RegExp('\\b' + kw + '\\b', 'gi').test(_k));
-            const v = keywords[k];
-            if (v <= 0.5) {
-              _mm = Math.min(mm, 6);
-            } else if (v <= 1) {
-              _mm = Math.min(mm, 10);
-            } else if (v <= 2) {
-              _mm = Math.min(mm, 12);
-            } else if (v <= 3) {
-              _mm = Math.min(mm, 15);
-            }
-            if (k.includes('vue')) {
-              _mm = Math.min(mm, 12);
-            }
-            scores[k] = Math.max(scores[k], v * _mm / 6);
-            mouths[k] = Math.max(mouths[k], mm);
-            return true;
-          } else {
-            return false;
-          }
-        });
-
-      }
-    }
-
-    data.scores = sum(values(scores));
-    data.skills = Object.keys(keywords).filter(k => mouths[k] > 0).map((k) => ({
-      kw: k.replace(/\(|\)/, '').split('|').shift(),
-      age: Number(mouths[k]),
-      score: Number(scores[k]),
-    }));
-    if (scores === 0) {
-      data.skills = [];
-      data.error = '很遗憾 ，没匹配到关键字！';
-    }
-
-  } else {
-    data.scores = -1;
+    data.error = '目标网址不是 lagou ';
+    data.scores = 0;
     data.skills = [];
-    data.error = '此网站已更新，插件过时';
+  } else {
+    // 目录：工作经验、项目经验等
+    const dir = document.querySelectorAll('.mr_jobe_list');
+    let scores = 0;
+    if (dir) {
+      Array.from(dir).forEach((td: HTMLTableCellElement) => {
+        const content = td.querySelector('.mr_content_m');
+        if (content) {
+          const time = td.querySelector('.mr_content_r') as HTMLSpanElement;
+          let timeStr = time.textContent;
+          timeStr = timeStr.replace(/\s/g, '');
+          timeStr = timeStr.replace(/\./g, '/');
+          timeStr = timeStr.replace(/-/g, '—');
+          // 时间段
+          let [start, end] = time ? timeStr.split('-') : ['0', '0'];
+          const workDate = calcWorkDate(start, end);
+
+          // 内容
+          const elm = Array.from(td.querySelectorAll('.mr_content_m')).pop() as HTMLTableCellElement;
+          workDate.workContent = elm ? elm.textContent : '';
+          keywords.work(workDate);
+        }
+      });
+      scores = keywords.calc(keywords.items);
+      data.scores = scores;
+      data.skills = Array.from(keywords)
+        .filter(({ gained }) => gained > 0)
+        .map(({ gained, months }) => ({
+          age: months,
+          score: gained,
+          kw: name,
+        }));
+    }
+
+    if (data.scores === 0) {
+      data.error = '很遗憾，没匹配到关键字！';
+    }
+    data.article = '...';
+  }
+  return data;
+}
+function parseLagouPdf(data: TableData, keywords: Tree<KeywordItem>): TableData {
+  if (!document.URL.includes('lagou')) {
+    data.error = '目标网址不是 lagou ';
+    data.scores = 0;
+    data.skills = [];
+  } else {
+    // 目录：工作经验、项目经验等
+    const pdf = document.querySelector('.preview-doc') as HTMLElement;
+    let scores = 0;
+    if (pdf) {
+      const timeReg = /(20\d{2}.\d{1,2})[\s\n-—]*(20\d{2}.\d{1,2}|至今)/gi;
+      const str = pdf.textContent;
+      let timeMatch;
+      let workDateIndex = [] as [WorkDate, number][];
+      while ((timeMatch = timeReg.exec(str)) != null)  {
+        let [timeStr, start, end] = timeMatch;
+        const workDate = calcWorkDate(start, end);
+        workDateIndex.push([workDate, timeMatch.index + timeStr.length]);
+      }
+      workDateIndex.reduce(
+        ([workDatePrev, indexPrev], [workDate, index]) => {
+          if (workDatePrev) {
+            // 内容
+            workDate.workContent = str.slice(indexPrev, index);
+            keywords.work(workDate);
+          }
+          return [workDate, index];
+        },
+        [null, null]
+      );
+
+      scores = keywords.calc(keywords.items);
+      data.scores = scores;
+      data.skills = Array.from(keywords)
+        .filter(({ gained }) => gained > 0)
+        .map(({ gained, months }) => ({
+          age: months,
+          score: gained,
+          kw: name,
+        }));
+    }
+
+    if (data.scores === 0) {
+      data.error = '很遗憾，没匹配到关键字！';
+    }
+    data.article = '...';
   }
   return data;
 }
